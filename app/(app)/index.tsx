@@ -38,7 +38,7 @@ export default function TodayScreen() {
   const today = todayKey();
   const parsed = parseDateKey(today)!;
   const [now, setNow] = useState(() => Date.now());
-  const [punching, setPunching] = useState<"in" | "out" | null>(null);
+  const [punchingOut, setPunchingOut] = useState(false);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 30_000);
@@ -108,17 +108,16 @@ export default function TodayScreen() {
     ]);
   }
 
-  async function doPunch(kind: "in" | "out") {
-    setPunching(kind);
+  async function doPunchOut() {
+    setPunchingOut(true);
     try {
-      if (kind === "in") await teacherApi.punch.in();
-      else await teacherApi.punch.out();
+      await teacherApi.punch.out();
       await qc.invalidateQueries({ queryKey: ["punch-today"] });
-      toast.success(kind === "in" ? "Punched in" : "Punched out");
+      toast.success("Punched out");
     } catch (err) {
       toast.error(handleApiError(err, "Punch failed"));
     } finally {
-      setPunching(null);
+      setPunchingOut(false);
     }
   }
 
@@ -226,25 +225,23 @@ export default function TodayScreen() {
             {expectedOut ? ` (expected ${expectedOut})` : ""}
           </Text>
         </View>
-        <View style={{ flexDirection: "row", gap: spacing.sm, marginTop: spacing.sm }}>
-          <View style={{ flex: 1 }}>
+        {!punchInAt ? (
+          <View style={{ marginTop: spacing.sm }}>
             <Button
-              title="Punch in"
-              variant="secondary"
-              disabled={!!punchInAt}
-              loading={punching === "in"}
-              onPress={() => doPunch("in")}
+              title="Scan QR to punch in"
+              onPress={() => router.push("/(app)/qr-punch")}
             />
           </View>
-          <View style={{ flex: 1 }}>
+        ) : (
+          <View style={{ marginTop: spacing.sm }}>
             <Button
               title="Punch out"
-              disabled={!punchInAt || !!punchOutAt}
-              loading={punching === "out"}
-              onPress={() => doPunch("out")}
+              disabled={!!punchOutAt}
+              loading={punchingOut}
+              onPress={() => doPunchOut()}
             />
           </View>
-        </View>
+        )}
       </Card>
 
       <View style={{ gap: spacing.sm }}>

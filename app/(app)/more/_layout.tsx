@@ -14,6 +14,7 @@ export default function MoreLayout() {
     >
       <Stack.Screen name="index" options={{ title: "More" }} />
       <Stack.Screen name="punch" options={{ title: "My punch" }} />
+      <Stack.Screen name="punch-month" options={{ title: "My month register" }} />
       <Stack.Screen name="profile" options={{ title: "Profile" }} />
       <Stack.Screen name="school" options={{ title: "School" }} />
       <Stack.Screen name="settings" options={{ title: "Settings" }} />

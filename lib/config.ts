@@ -1,7 +1,8 @@
 const raw = process.env.EXPO_PUBLIC_API_URL?.trim() ?? "";
 
 /** Hosted backend base URL (no trailing slash). Never use localhost in production builds. */
-export const API_URL = raw.replace(/\/$/, "");
+// export const API_URL = raw.replace(/\/$/, "");
+export const API_URL = "https://api.schoolsuite24.com";
 
 export function assertApiUrl(): string {
   if (!API_URL) {

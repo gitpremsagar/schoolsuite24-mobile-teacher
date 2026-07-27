@@ -1,4 +1,5 @@
 import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { router } from "expo-router";
 import { useEffect, useState } from "react";
 import { RefreshControl, ScrollView, Text, View } from "react-native";
 import { useTheme } from "@/components/theme/theme-provider";
@@ -17,7 +18,7 @@ export default function PunchScreen() {
   const toast = useToast();
   const qc = useQueryClient();
   const [now, setNow] = useState(() => Date.now());
-  const [punching, setPunching] = useState<"in" | "out" | null>(null);
+  const [punchingOut, setPunchingOut] = useState(false);
 
   useEffect(() => {
     const id = setInterval(() => setNow(Date.now()), 30_000);
@@ -54,17 +55,17 @@ export default function PunchScreen() {
     ? handleApiError(punchQuery.error, "Failed to load punch status")
     : "";
 
-  async function doPunch(kind: "in" | "out") {
-    setPunching(kind);
+  async function doPunchOut() {
+    setPunchingOut(true);
     try {
-      if (kind === "in") await teacherApi.punch.in();
-      else await teacherApi.punch.out();
+      await teacherApi.punch.out();
       await qc.invalidateQueries({ queryKey: ["punch-today"] });
-      toast.success(kind === "in" ? "Punched in" : "Punched out");
+      await qc.invalidateQueries({ queryKey: ["punch-month"] });
+      toast.success("Punched out");
     } catch (err) {
       toast.error(handleApiError(err, "Punch failed"));
     } finally {
-      setPunching(null);
+      setPunchingOut(false);
     }
   }
 
@@ -121,36 +122,40 @@ export default function PunchScreen() {
                 {expectedOut ? ` (expected ${expectedOut})` : ""}
               </Text>
             </View>
-            <View
-              style={{
-                flexDirection: "row",
-                gap: spacing.sm,
-                marginTop: spacing.md,
-              }}
-            >
-              <View style={{ flex: 1 }}>
+            <View style={{ gap: spacing.sm, marginTop: spacing.md }}>
+              {!punchInAt ? (
                 <Button
-                  title="Punch in"
-                  variant="secondary"
-                  disabled={!!punchInAt}
-                  loading={punching === "in"}
-                  onPress={() => doPunch("in")}
+                  title="Scan QR to punch in"
+                  onPress={() => router.push("/(app)/qr-punch")}
                 />
-              </View>
-              <View style={{ flex: 1 }}>
+              ) : (
                 <Button
                   title="Punch out"
-                  disabled={!punchInAt || !!punchOutAt}
-                  loading={punching === "out"}
-                  onPress={() => doPunch("out")}
+                  disabled={!!punchOutAt}
+                  loading={punchingOut}
+                  onPress={() => doPunchOut()}
                 />
-              </View>
+              )}
+              {punchInAt && !punchOutAt ? (
+                <Button
+                  title="Scan QR to punch out"
+                  variant="secondary"
+                  onPress={() => router.push("/(app)/qr-punch")}
+                />
+              ) : null}
             </View>
           </Card>
+
           <Card
-            title="History"
-            subtitle="Punch history is only available to school admins. This screen shows today's punch only."
-          />
+            title="Month register"
+            subtitle="View your present/absent days and punch times for the month."
+          >
+            <Button
+              title="Open my month register"
+              variant="secondary"
+              onPress={() => router.push("/(app)/more/punch-month")}
+            />
+          </Card>
         </>
       )}
     </ScrollView>

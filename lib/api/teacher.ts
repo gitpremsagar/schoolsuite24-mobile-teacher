@@ -71,13 +71,38 @@ export const teacherApi = {
       apiFetch<{ attendance: Row | null; date: string }>(
         "/attendance/staff/today",
       ),
-    in: () =>
-      apiFetch<{ attendance: Row }>("/attendance/staff/punch-in", {
-        method: "POST",
-      }),
     out: () =>
       apiFetch<{ attendance: Row }>("/attendance/staff/punch-out", {
         method: "POST",
       }),
+    qr: (token: string) =>
+      apiFetch<{ action: "PUNCH_IN" | "PUNCH_OUT"; attendance: Row }>(
+        "/attendance/staff/qr-punch",
+        { method: "POST", body: { token } },
+      ),
+    month: (year: number, month: number) =>
+      apiFetch<{
+        year: number;
+        month: number;
+        daysInMonth: number;
+        days: number[];
+        holidays: string[];
+        staff: {
+          staffProfileId: string;
+          employeeCode: string;
+          staffType: string;
+          name: string;
+          email: string;
+          role: string;
+          days: Record<
+            string,
+            {
+              status: AttendanceStatus;
+              punchInAt: string | null;
+              punchOutAt: string | null;
+            } | null
+          >;
+        };
+      }>(`/attendance/staff/me/month?year=${year}&month=${month}`),
   },
 };

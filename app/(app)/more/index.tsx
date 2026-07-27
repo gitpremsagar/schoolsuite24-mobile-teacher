@@ -22,8 +22,24 @@ export default function MoreScreen() {
       <ListRow
         leading={<Ionicons name="time-outline" size={22} color={colors.primary} />}
         title="My punch"
-        subtitle="Punch in and out for today"
+        subtitle="Punch in via QR, punch out here or via QR"
         onPress={() => router.push("/(app)/more/punch")}
+      />
+      <ListRow
+        leading={
+          <Ionicons name="qr-code-outline" size={22} color={colors.primary} />
+        }
+        title="Scan to punch"
+        subtitle="Scan the school QR to punch in or out"
+        onPress={() => router.push("/(app)/qr-punch")}
+      />
+      <ListRow
+        leading={
+          <Ionicons name="calendar-outline" size={22} color={colors.primary} />
+        }
+        title="My month register"
+        subtitle="Your attendance calendar"
+        onPress={() => router.push("/(app)/more/punch-month")}
       />
       <ListRow
         leading={<Ionicons name="person-outline" size={22} color={colors.primary} />}

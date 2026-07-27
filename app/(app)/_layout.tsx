@@ -82,6 +82,13 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
+        name="qr-punch"
+        options={{
+          href: null,
+          title: "Scan to punch",
+        }}
+      />
+      <Tabs.Screen
         name="more"
         options={{
           title: "More",
