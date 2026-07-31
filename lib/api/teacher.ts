@@ -105,4 +105,55 @@ export const teacherApi = {
         };
       }>(`/attendance/staff/me/month?year=${year}&month=${month}`),
   },
+  exams: {
+    list: (academicYearId?: string) => {
+      const qs = academicYearId
+        ? `?academicYearId=${encodeURIComponent(academicYearId)}`
+        : "";
+      return apiFetch<{ examinations: Row[] }>(`/exams${qs}`);
+    },
+    create: (body: Record<string, unknown>) =>
+      apiFetch<{ examination: Row }>("/exams", { method: "POST", body }),
+    get: (id: string) =>
+      apiFetch<{ examination: Row }>(`/exams/${encodeURIComponent(id)}`),
+    update: (id: string, body: Record<string, unknown>) =>
+      apiFetch<{ examination: Row }>(`/exams/${encodeURIComponent(id)}`, {
+        method: "PATCH",
+        body,
+      }),
+    remove: (id: string) =>
+      apiFetch<{ ok: boolean }>(`/exams/${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      }),
+    markSheets: (id: string, classId?: string, subjectId?: string) => {
+      const params = new URLSearchParams();
+      if (classId) params.set("classId", classId);
+      if (subjectId) params.set("subjectId", subjectId);
+      const qs = params.toString();
+      return apiFetch<{ markSheets: Row[] }>(
+        `/exams/${encodeURIComponent(id)}/marksheets${qs ? `?${qs}` : ""}`,
+      );
+    },
+    saveMarks: (
+      id: string,
+      body: { records: { id: string; marksObtained: number | null }[] },
+    ) =>
+      apiFetch<{ ok: boolean; updated: number }>(
+        `/exams/${encodeURIComponent(id)}/marksheets`,
+        { method: "PUT", body },
+      ),
+    publish: (
+      id: string,
+      body: {
+        publish?: boolean;
+        ids?: string[];
+        classId?: string;
+        subjectId?: string;
+      },
+    ) =>
+      apiFetch<{ ok: boolean; updated: number; published: boolean }>(
+        `/exams/${encodeURIComponent(id)}/marksheets/publish`,
+        { method: "POST", body },
+      ),
+  },
 };

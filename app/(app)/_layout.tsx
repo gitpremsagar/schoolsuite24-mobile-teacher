@@ -75,6 +75,16 @@ export default function AppLayout() {
         }}
       />
       <Tabs.Screen
+        name="exams"
+        options={{
+          title: "Exams",
+          headerShown: false,
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="document-text-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      <Tabs.Screen
         name="students"
         options={{
           href: null,
